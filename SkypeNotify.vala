@@ -51,6 +51,7 @@ namespace SkypeNotify {
 		private Mutex check_missed_chats_mutex = new Mutex();
 		private string missed_chats_command;
 		private string no_missed_chats_command;
+		private bool? previous_missed_chats_state = null;
 
 		private SkypeWrapper skype;
 		private NotifyReceiver notifyReceiver;
@@ -90,7 +91,9 @@ namespace SkypeNotify {
 
 				if (missed_chats.has_prefix("CHATS ")) {
 					bool has_missed_chats = missed_chats.char_count() > "CHATS ".char_count();
-					on_missed_chats(has_missed_chats);
+					if (has_missed_chats != previous_missed_chats_state)
+						on_missed_chats(has_missed_chats);
+					previous_missed_chats_state = has_missed_chats;
 				} else {
 					stderr.printf ("Unexpected response to SEARCH MISSEDCHATS: %s\n", missed_chats);
 				}
